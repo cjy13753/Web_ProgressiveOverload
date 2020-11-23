@@ -5,7 +5,7 @@ class ExerciseModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     exercise_name = db.Column(db.String(50), unique=True, nullable=False)
-    body_part_id = db.Column(db.String(10), db.ForeignKey('body_part.id'))
+    body_part_id = db.Column(db.String(10), db.ForeignKey('body_part.id'), nullable=False)
     body_part = db.relationship('BodyPartModel')
 
     def json(self):

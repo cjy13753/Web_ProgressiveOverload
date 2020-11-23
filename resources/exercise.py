@@ -28,9 +28,9 @@ class Exercise(Resource):
         data = Exercise.parser.parse_args()
         exercise = ExerciseModel(exercise_name=exercise_name, body_part_id=data['body_part_id'])
         print(exercise_name)
-        # try:
-        exercise.save_to_db()
-        # except:
-            # return {"message": "An error occurred inserting the item."}, 500
+        try:
+            exercise.save_to_db()
+        except:
+            return {"message": "An error occurred inserting the item."}, 500
 
         return exercise.json(), 201

@@ -4,6 +4,7 @@ from flask_restful import Api
 
 from resources.body_part import BodyPartList, BodyPart
 from resources.exercise import ExerciseList, Exercise
+from resources.workout_record import WorkoutRecordList, WorkoutRecord
 
 from db import db
 
@@ -21,6 +22,8 @@ api.add_resource(BodyPartList, '/bodyparts')
 api.add_resource(BodyPart, '/body_part/<string:body_part_name>')
 api.add_resource(ExerciseList, '/exercises')
 api.add_resource(Exercise, '/exercise/<string:exercise_name>')
+api.add_resource(WorkoutRecordList, '/workoutrecords')
+api.add_resource(WorkoutRecord, '/workout_record')
 
 
 if __name__ == '__main__':
