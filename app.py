@@ -3,6 +3,7 @@ from flask import Flask
 from flask_restful import Api
 
 from resources.body_part import BodyPartList, BodyPart
+from resources.exercise import ExerciseList, Exercise
 
 from db import db
 
@@ -14,10 +15,12 @@ api = Api(app)
 db.init_app(app)
 @app.before_first_request
 def create_tables():
-    db.create_all()
+    db.create_all() 
 
 api.add_resource(BodyPartList, '/bodyparts')
 api.add_resource(BodyPart, '/body_part/<string:body_part_name>')
+api.add_resource(ExerciseList, '/exercises')
+api.add_resource(Exercise, '/exercise/<string:exercise_name>')
 
 
 if __name__ == '__main__':
