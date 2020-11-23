@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_restful import Api
 
-from resources.body_part import BodyPartList
+from resources.body_part import BodyPartList, BodyPart
 
 from db import db
 
@@ -17,6 +17,7 @@ def create_tables():
     db.create_all()
 
 api.add_resource(BodyPartList, '/bodyparts')
+api.add_resource(BodyPart, '/body_part/<string:body_part_name>')
 
 
 if __name__ == '__main__':
