@@ -9,7 +9,7 @@ class ExerciseModel(db.Model):
     body_part = db.relationship('BodyPartModel')
 
     def json(self):
-        return {'id': self.id, 'exercise_name': self.exercise_name, 'body_part_id': self.body_part_id}
+        return {'id': self.id, 'exercise_name': self.exercise_name, 'body_part_id': self.body_part_id, 'body_part': self.body_part.body_part_name} # self.body_part is an BodyPartModel instance.
     
     @classmethod
     def find_by_exercise_name(cls, exercise_name):

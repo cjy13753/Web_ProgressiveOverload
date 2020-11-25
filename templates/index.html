@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css" />
 
     <script type="text/javascript">
-        function dropdown_bodypart() {
+        //functions for body-part
+        function append_bodyparts_for_dropdown() {
             $("#bodyparts_dropdown").html('');
             $.json("http://127.0.0.1:5000/bodyparts").then(
                 function(response){
@@ -23,11 +24,40 @@
             );
         }
         
-        function append_to_dropdown_bodypart(body_part){
-            let tmp_html = '<li><a href="#">'+body_part+'</a></li>'
+        function append_to_dropdown_bodypart(body_part) {
+            let tmp_html = '<li onclick=append_exercises_for_dropdown('+"'"+body_part+"'"+')><a>'+body_part+'</a></li>'
             $('#bodyparts_dropdown').append(tmp_html)
         }
         
+        //functions for exercise
+        function append_exercises_for_dropdown(body_part) {
+            $("#exercises_dropdown").html('');
+            $.json("http://127.0.0.1:5000/exercises").then(
+                function(response){
+                    let exercises = response["exercises"];
+                    console.log(exercises)
+                    for (let i = 0; i < exercises.length; i++){
+                        let body_part_from_db = exercises[i]["body_part"]
+                        console.log(body_part_from_db)
+                        console.log(body_part)
+                        console.log(body_part_from_db == body_part)
+                        if (body_part_from_db == body_part) {
+                            append_to_dropdown_exercise(exercises[i]["exercise_name"])
+                        }
+                    }
+
+                }
+            );
+        }
+
+        function append_to_dropdown_exercise(exercise) {
+            let tmp_html = '<li><a>'+exercise+'</a></li>'
+            $('#exercises_dropdown').append(tmp_html)
+        }
+
+
+
+
     </script>
     
 
@@ -41,9 +71,9 @@
                 <!-- body-part here -->
                 <div class="cell-6">
                     <div class="dropdown-button">
-                        <button class="button dropdown-toggle" onclick="dropdown_bodypart()">Button</button>
+                        <button class="button dropdown-toggle" onclick="append_bodyparts_for_dropdown()">Button</button>
                         <ul class="d-menu" data-role="dropdown" id="bodyparts_dropdown">
-                            <li><a href="#">This ill be replaced by data from the db.</a></li>
+                            <li><a href="#">This will be replaced by data from the db.</a></li>
                         </ul>
                     </div>
                 </div>
@@ -51,10 +81,8 @@
                 <div class="cell-6">
                     <div class="dropdown-button">
                         <button class="button dropdown-toggle">Button</button>
-                        <ul class="d-menu" data-role="dropdown">
-                            <li><a href="#">Reply</a></li>
-                            <li><a href="#">Reply All</a></li>
-                            <li><a href="#">Forward</a></li>
+                        <ul class="d-menu" data-role="dropdown" id="exercises_dropdown">
+                            <li><a href="#">This will be replaced by data from the db.</a></li>
                         </ul>
                     </div>
                 </div>
@@ -83,7 +111,7 @@
             <!-- register here -->
             <div class="row">
                 <div class="cell-12">
-                    <button class="button primary">등록하기</button>
+                    <button class="button primary">Register</button>
                 </div>
             </div>
             <!-- workout record here -->
