@@ -10,10 +10,15 @@
     <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css" />
 
     <script type="text/javascript">
+        function hostname() {
+            window.value='http://127.0.0.1:5000'
+        }
+
         //functions for body-part
         function append_bodyparts_for_dropdown() {
+            hostname()
             $("#bodyparts_dropdown").html('');
-            $.json("http://127.0.0.1:5000/bodyparts").then(
+            $.json(window.value+ "/bodyparts").then(
                 function (response) {
                     let body_parts = response["body_parts"];
                     for (let i = 0; i < body_parts.length; i++) {
@@ -37,8 +42,9 @@
 
         //functions for exercise
         function append_exercises_for_dropdown(body_part) {
+            hostname()
             $("#exercises_dropdown").html('');
-            $.json("http://127.0.0.1:5000/exercises").then(
+            $.json(window.value + "/exercises").then(
                 function (response) {
                     let exercises = response["exercises"];
                     for (let i = 0; i < exercises.length; i++) {
@@ -65,15 +71,16 @@
 
         //functions for registering workout-record
         function post_workout_record() {
+            hostname()
             let exercise_name = $("#exercise_name").html()
             console.log(exercise_name)
             let set_number = $("#set_number").val()
             let weight = $("#weight").val()
             let reps = $("#reps").val()
-            $.json('http://127.0.0.1:5000/exercise/' + exercise_name).then(
+            $.json(window.value + "/exercise/" + exercise_name).then(
                 function (response) {
                     exercise_id = response['id']
-                    $.post('http://127.0.0.1:5000/workout_record', {
+                    $.post(window.value + "/workout_record", {
                         set_number: set_number,
                         weight: weight,
                         reps: reps,
@@ -89,12 +96,13 @@
         }
 
         function put_workoutrecord_table_on_dropdown(exercise) {
+            hostname()
             let exercise_name = exercise
-            $.json('http://127.0.0.1:5000/exercise/' + exercise_name).then(
+            $.json(window.value + "/exercise/" + exercise_name).then(
                 function (response) {
                     exercise_id = response['id']
                     $.ajax({
-                        url: "http://127.0.0.1:5000/workout_record_table",
+                        url: window.value + "/workout_record_table",
                         method: "GET",
                         data: {
                             exercise_id: exercise_id
@@ -111,12 +119,13 @@
         }
 
         function put_workoutrecord_table_on_register() {
+            hostname()
             let exercise_name = $("#exercise_name").html()
-            $.json('http://127.0.0.1:5000/exercise/' + exercise_name).then(
+            $.json(window.value + "/exercise/" + exercise_name).then(
                 function (response) {
                     exercise_id = response['id']
                     $.ajax({
-                        url: "http://127.0.0.1:5000/workout_record_table",
+                        url: window.value + "/workout_record_table",
                         method: "GET",
                         data: {
                             exercise_id: exercise_id
@@ -194,7 +203,8 @@
             <!-- register here -->
             <div class="row">
                 <div class="cell-12">
-                    <button class="button primary" onclick="post_workout_record();put_workoutrecord_table_on_register()">Register</button>
+                    <button class="button primary"
+                        onclick="post_workout_record();put_workoutrecord_table_on_register()">Register</button>
                 </div>
             </div>
             <!-- <div class="row">
