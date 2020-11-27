@@ -4,6 +4,9 @@ import pandas as pd
 
 class WorkoutRecordModel(db.Model):
     __tablename__ = 'workout_record'
+    __table_args__ = (
+        db.UniqueConstraint('set_number', 'created_on', 'exercise_id'),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     set_number = db.Column(db.Integer, nullable=False)
