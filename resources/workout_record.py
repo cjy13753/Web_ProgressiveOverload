@@ -6,6 +6,7 @@ class WorkoutRecordList(Resource):
     def get(self):
         return {"workout_records": [workout_record.json() for workout_record in WorkoutRecordModel.find_all()]}
 
+
 class WorkoutRecord(Resource):
     parser = reqparse.RequestParser()
 
@@ -23,3 +24,18 @@ class WorkoutRecord(Resource):
             return {"message": "An error occurred inserting the item."}, 500
 
         return workout_record.json(), 201
+
+
+class WorkoutRecordTable(Resource):
+    parser = reqparse.RequestParser()
+        
+    parser.add_argument(
+        name= 'exercise_id',
+        type= int,
+        required= True,
+        help= "This field cannot be left blank"
+    )
+    
+    def get(self):
+        data = WorkoutRecordTable.parser.parse_args()
+        return WorkoutRecordModel.get_table(**data)

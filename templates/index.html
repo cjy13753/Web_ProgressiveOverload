@@ -14,33 +14,35 @@
         function append_bodyparts_for_dropdown() {
             $("#bodyparts_dropdown").html('');
             $.json("http://127.0.0.1:5000/bodyparts").then(
-                function(response){
+                function (response) {
                     let body_parts = response["body_parts"];
-                    for (let i = 0; i < body_parts.length; i++){
+                    for (let i = 0; i < body_parts.length; i++) {
                         append_to_dropdown_bodypart(body_parts[i]["body_part_name"])
                     }
 
                 }
             );
         }
-        
+
         function append_to_dropdown_bodypart(body_part) {
-            let tmp_html = '<li onclick=append_exercises_for_dropdown('+"'"+body_part+"'"+')><a>'+body_part+'</a></li>'
+            let tmp_html = '<li onclick="append_exercises_for_dropdown(' + "'" + body_part + "'" + ');put_body_part_next_to_button(' + "'" + body_part + "'" + ')"><a>' + body_part + '</a></li>'
             $('#bodyparts_dropdown').append(tmp_html)
         }
-        
+
+        function put_body_part_next_to_button(body_part) {
+            // input next to the body_part button(needs to be separated)
+            let tmp = '<strong>' + body_part + '</strong>'
+            $("#input_for_body_part").html(tmp)
+        }
+
         //functions for exercise
         function append_exercises_for_dropdown(body_part) {
             $("#exercises_dropdown").html('');
             $.json("http://127.0.0.1:5000/exercises").then(
-                function(response){
+                function (response) {
                     let exercises = response["exercises"];
-                    console.log(exercises)
-                    for (let i = 0; i < exercises.length; i++){
+                    for (let i = 0; i < exercises.length; i++) {
                         let body_part_from_db = exercises[i]["body_part"]
-                        console.log(body_part_from_db)
-                        console.log(body_part)
-                        console.log(body_part_from_db == body_part)
                         if (body_part_from_db == body_part) {
                             append_to_dropdown_exercise(exercises[i]["exercise_name"])
                         }
@@ -51,15 +53,86 @@
         }
 
         function append_to_dropdown_exercise(exercise) {
-            let tmp_html = '<li><a>'+exercise+'</a></li>'
+            $('#exercises_dropdown').html('')
+            let tmp_html = '<li onclick="put_exercise_next_to_button(' + "'" + exercise + "'" + ');put_workoutrecord_table_on_dropdown(' + "'" + exercise + "'" + ')"><a>' + exercise + '</a></li>'
             $('#exercises_dropdown').append(tmp_html)
         }
 
+        function put_exercise_next_to_button(exercise_name) {
+            let tmp = '<strong id="exercise_name">' + exercise_name + '</strong>'
+            $('#input_for_exercise').html(tmp)
+        }
 
+        //functions for registering workout-record
+        function post_workout_record() {
+            let exercise_name = $("#exercise_name").html()
+            console.log(exercise_name)
+            let set_number = $("#set_number").val()
+            let weight = $("#weight").val()
+            let reps = $("#reps").val()
+            $.json('http://127.0.0.1:5000/exercise/' + exercise_name).then(
+                function (response) {
+                    exercise_id = response['id']
+                    $.post('http://127.0.0.1:5000/workout_record', {
+                        set_number: set_number,
+                        weight: weight,
+                        reps: reps,
+                        exercise_id: exercise_id
+                    }).then(
+                        function (response) {
+                            console.log(response)
+                        }
+                    )
+                }
+            )
 
+        }
 
+        function put_workoutrecord_table_on_dropdown(exercise) {
+            let exercise_name = exercise
+            $.json('http://127.0.0.1:5000/exercise/' + exercise_name).then(
+                function (response) {
+                    exercise_id = response['id']
+                    $.ajax({
+                        url: "http://127.0.0.1:5000/workout_record_table",
+                        method: "GET",
+                        data: {
+                            exercise_id: exercise_id
+                        }
+                    }).then(
+                        function (response) {
+                            response_json = JSON.parse(response)
+                            $('#table_testing').html(response_json["response"])
+
+                        }
+                    )
+                }
+            )
+        }
+
+        function put_workoutrecord_table_on_register() {
+            let exercise_name = $("#exercise_name").html()
+            $.json('http://127.0.0.1:5000/exercise/' + exercise_name).then(
+                function (response) {
+                    exercise_id = response['id']
+                    $.ajax({
+                        url: "http://127.0.0.1:5000/workout_record_table",
+                        method: "GET",
+                        data: {
+                            exercise_id: exercise_id
+                        }
+                    }).then(
+                        function (response) {
+                            response_json = JSON.parse(response)
+                            $('#table_testing').html(response_json["response"])
+
+                        }
+                    )
+                }
+            )
+        }
     </script>
-    
+
 
 
 </head>
@@ -69,16 +142,21 @@
         <div class="grid">
             <div class="row">
                 <!-- body-part here -->
-                <div class="cell-6">
+                <div class="cell-3">
                     <div class="dropdown-button">
                         <button class="button dropdown-toggle" onclick="append_bodyparts_for_dropdown()">Button</button>
                         <ul class="d-menu" data-role="dropdown" id="bodyparts_dropdown">
-                            <li><a href="#">This will be replaced by data from the db.</a></li>
+                            <li><a href="#">Select body part first.</a></li>
                         </ul>
                     </div>
                 </div>
+                <!-- body-part output -->
+                <div class="cell-3">
+                    <div id="input_for_body_part">
+                    </div>
+                </div>
                 <!-- exercise here -->
-                <div class="cell-6">
+                <div class="cell-3">
                     <div class="dropdown-button">
                         <button class="button dropdown-toggle">Button</button>
                         <ul class="d-menu" data-role="dropdown" id="exercises_dropdown">
@@ -86,67 +164,47 @@
                         </ul>
                     </div>
                 </div>
+                <!-- exercise output-->
+                <div class="cell-3">
+                    <div id="input_for_exercise">
+                    </div>
+                </div>
             </div>
             <!-- set number here -->
             <div class="row">
                 <div class="cell-12">
                     set number
-                    <input type="text" data-role="spinner">
+                    <input type="text" data-role="spinner" id="set_number">
                 </div>
             </div>
             <!-- weight here -->
             <div class="row">
                 <div class="cell-12">
                     weight(kg)
-                    <input type="text" data-role="spinner">
+                    <input type="text" data-role="spinner" id="weight">
                 </div>
             </div>
             <!-- reps here -->
             <div class="row">
                 <div class="cell-12">
                     reps
-                    <input type="text" data-role="spinner">
+                    <input type="text" data-role="spinner" id="reps">
                 </div>
             </div>
             <!-- register here -->
             <div class="row">
                 <div class="cell-12">
-                    <button class="button primary">Register</button>
+                    <button class="button primary" onclick="post_workout_record();put_workoutrecord_table_on_register()">Register</button>
                 </div>
             </div>
+            <!-- <div class="row">
+                <div class="cell-12">
+                    <button class="button primary" onclick="put_workoutrecord_table_on_register()">test</button>
+                </div>
+            </div> -->
             <!-- workout record here -->
             <div class="row">
-                <div class="cell-12">
-                    <table class="table striped">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Username</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Bill</td>
-                            <td>Gates</td>
-                            <td>@billy</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Steve</td>
-                            <td>Jobs</td>
-                            <td>@stevy</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Larry</td>
-                            <td>Page</td>
-                            <td>@larry</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="cell-12" id="table_testing">
                 </div>
             </div>
             <!-- countdown start here-->

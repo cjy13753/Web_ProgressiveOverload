@@ -1,4 +1,6 @@
+from flask import jsonify
 from db import db
+import pandas as pd
 
 class WorkoutRecordModel(db.Model):
     __tablename__ = 'workout_record'
@@ -7,7 +9,7 @@ class WorkoutRecordModel(db.Model):
     set_number = db.Column(db.Integer, nullable=False)
     weight = db.Column(db.Integer, nullable=False)
     reps = db.Column(db.Integer, nullable=False)
-    created_on = db.Column(db.DateTime, server_default=db.func.now())
+    created_on = db.Column(db.Date, server_default=db.func.now())
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.id'), nullable=False)
 
     def json(self):
@@ -30,4 +32,23 @@ class WorkoutRecordModel(db.Model):
 
     def save_to_db(self):
         db.session.add(self)
-        db.session.commit()   
+        db.session.commit()
+
+    @classmethod    
+    def get_table(cls, exercise_id):
+        query = ''' 
+            SELECT set_number, weight, reps, created_on FROM workout_record 
+            WHERE exercise_id={} AND created_on in (SELECT DISTINCT created_on FROM workout_record ORDER BY created_on DESC LIMIT 3);
+        '''.format(exercise_id)
+        result = db.session.execute(query)
+        rows = []
+        for r in result:
+            rows.append(dict(r.items()))
+
+        df = pd.DataFrame(rows)
+        created_on = df['created_on'].unique()
+        df_reshaping_melted = df.melt(id_vars=['created_on', 'set_number'])
+        df_reshaping_pivoting = df_reshaping_melted.pivot(index=['set_number', 'variable'], columns='created_on', values='value').reset_index()
+        df_pivoting_after_reshaping = df_reshaping_pivoting.pivot(index='set_number', columns='variable', values=created_on).fillna('-')
+                
+        return jsonify({"response": df_pivoting_after_reshaping.to_html()})
