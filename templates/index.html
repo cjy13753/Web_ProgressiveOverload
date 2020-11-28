@@ -36,7 +36,7 @@
 
         function put_body_part_next_to_button(body_part) {
             // input next to the body_part button(needs to be separated)
-            let tmp = '<strong>' + body_part + '</strong>'
+            let tmp = '<strong id="value_for_body_part">' + body_part + '</strong>'
             $("#input_for_body_part").html(tmp)
         }
 
@@ -47,6 +47,7 @@
             $.json(window.value + "/exercises").then(
                 function (response) {
                     let exercises = response["exercises"];
+                    console.log(exercises)
                     for (let i = 0; i < exercises.length; i++) {
                         let body_part_from_db = exercises[i]["body_part"]
                         if (body_part_from_db == body_part) {
@@ -59,7 +60,6 @@
         }
 
         function append_to_dropdown_exercise(exercise) {
-            $('#exercises_dropdown').html('')
             let tmp_html = '<li onclick="put_exercise_next_to_button(' + "'" + exercise + "'" + ');put_workoutrecord_table_on_dropdown(' + "'" + exercise + "'" + ')"><a>' + exercise + '</a></li>'
             $('#exercises_dropdown').append(tmp_html)
         }
@@ -67,6 +67,24 @@
         function put_exercise_next_to_button(exercise_name) {
             let tmp = '<strong id="exercise_name">' + exercise_name + '</strong>'
             $('#input_for_exercise').html(tmp)
+        }
+        
+        //functions for adding new exercise
+        function post_new_exercise() {
+            input_for_body_part = $("#value_for_body_part").html()
+            input_for_new_exercise = $("#input_for_new_exercise").val()
+            $.json(window.value + "/body_part/" + input_for_body_part).then(
+                function (response) {
+                    body_part_id = response["id"]
+                    $.post(window.value + "/exercise/" + input_for_new_exercise, {
+                        body_part_id: body_part_id
+                    }).then(
+                        function (response) {
+                            console.log(response)
+                        }
+                    )
+                }
+            )
         }
 
         //functions for registering workout-record
@@ -141,21 +159,19 @@
             )
         }
     </script>
-
-
-
 </head>
 
 <body>
     <div class="container">
         <div class="grid">
+            <!-- buttons for body_part and exercise -->
             <div class="row">
                 <!-- body-part here -->
                 <div class="cell-3">
                     <div class="dropdown-button">
                         <button class="button dropdown-toggle" onclick="append_bodyparts_for_dropdown()">Button</button>
                         <ul class="d-menu" data-role="dropdown" id="bodyparts_dropdown">
-                            <li><a href="#">Select body part first.</a></li>
+                            <li><a>Select body part first.</a></li>
                         </ul>
                     </div>
                 </div>
@@ -179,25 +195,34 @@
                     </div>
                 </div>
             </div>
+            <!-- Add new exercise -->
+            <div class="row">
+                <div class="cell-10">
+                    <input type="text" data-role="input" data-prepend="New Exercise: " id="input_for_new_exercise">
+                </div>
+                <div class="cell-2">
+                    <button class="button primary" onclick="post_new_exercise()">Add</button>
+                </div>
+            </div>
             <!-- set number here -->
             <div class="row">
                 <div class="cell-12">
                     set number
-                    <input type="text" data-role="spinner" id="set_number">
+                    <input type="text" data-role="spinner" data-min-value="1" id="set_number">
                 </div>
             </div>
             <!-- weight here -->
             <div class="row">
                 <div class="cell-12">
                     weight(kg)
-                    <input type="text" data-role="spinner" id="weight">
+                    <input type="text" data-role="spinner" data-min-value="1" data-step="2.5" data-fixed="1" id="weight">
                 </div>
             </div>
             <!-- reps here -->
             <div class="row">
                 <div class="cell-12">
                     reps
-                    <input type="text" data-role="spinner" id="reps">
+                    <input type="text" data-role="spinner" data-min-value="1" id="reps">
                 </div>
             </div>
             <!-- register here -->
@@ -207,11 +232,6 @@
                         onclick="post_workout_record();put_workoutrecord_table_on_register()">Register</button>
                 </div>
             </div>
-            <!-- <div class="row">
-                <div class="cell-12">
-                    <button class="button primary" onclick="put_workoutrecord_table_on_register()">test</button>
-                </div>
-            </div> -->
             <!-- workout record here -->
             <div class="row">
                 <div class="cell-12" id="table_testing">

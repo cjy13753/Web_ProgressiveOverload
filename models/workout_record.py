@@ -10,7 +10,7 @@ class WorkoutRecordModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     set_number = db.Column(db.Integer, nullable=False)
-    weight = db.Column(db.Integer, nullable=False)
+    weight = db.Column(db.Float, nullable=False)
     reps = db.Column(db.Integer, nullable=False)
     created_on = db.Column(db.Date, server_default=db.func.now())
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.id'), nullable=False)
@@ -26,8 +26,8 @@ class WorkoutRecordModel(db.Model):
         }
     
     @classmethod
-    def addarg(cls, argument):
-        return {"name": argument, "type": int, "required": True, "help": "This field cannot be left blank"}
+    def addarg(cls, argument, datatype):
+        return {"name": argument, "type": datatype, "required": True, "help": "This field cannot be left blank"}
 
     @classmethod
     def find_all(cls):

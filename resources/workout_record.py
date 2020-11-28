@@ -10,10 +10,10 @@ class WorkoutRecordList(Resource):
 class WorkoutRecord(Resource):
     parser = reqparse.RequestParser()
 
-    parser.add_argument(**WorkoutRecordModel.addarg('set_number'))
-    parser.add_argument(**WorkoutRecordModel.addarg('weight'))
-    parser.add_argument(**WorkoutRecordModel.addarg('reps'))
-    parser.add_argument(**WorkoutRecordModel.addarg('exercise_id'))
+    parser.add_argument(**WorkoutRecordModel.addarg('set_number', int))
+    parser.add_argument(**WorkoutRecordModel.addarg('weight', float))
+    parser.add_argument(**WorkoutRecordModel.addarg('reps', int))
+    parser.add_argument(**WorkoutRecordModel.addarg('exercise_id', int))
         
     def post(self):
         data = WorkoutRecord.parser.parse_args()
