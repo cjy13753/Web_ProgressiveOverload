@@ -41,8 +41,8 @@ class WorkoutRecordModel(db.Model):
     def get_table(cls, exercise_id):
         query = ''' 
             SELECT set_number, weight, reps, created_on FROM workout_record 
-            WHERE exercise_id={} AND created_on in (SELECT DISTINCT created_on FROM workout_record ORDER BY created_on DESC LIMIT 3);
-        '''.format(exercise_id)
+            WHERE exercise_id={} AND created_on in (SELECT DISTINCT created_on FROM workout_record WHERE exercise_id={} ORDER BY created_on DESC LIMIT 3);
+        '''.format(exercise_id, exercise_id)
         result = db.session.execute(query)
         rows = []
         for r in result:
