@@ -49,6 +49,10 @@ class WorkoutRecordModel(db.Model):
             rows.append(dict(r.items()))
 
         df = pd.DataFrame(rows)
+        df.rename(columns={'weight':'0_wgt'}, inplace=True)
+        df.rename(columns={'reps':'1_rep'}, inplace=True)
+        df.created_on = pd.to_datetime(df.created_on)
+        df.created_on = df.created_on.dt.strftime('%m-%d')
         created_on = df['created_on'].unique()
         df_reshaping_melted = df.melt(id_vars=['created_on', 'set_number'])
         df_reshaping_pivoting = df_reshaping_melted.pivot(index=['set_number', 'variable'], columns='created_on', values='value').reset_index()
