@@ -4,7 +4,7 @@ class BodyPartModel(db.Model):
     __tablename__ = 'body_part'
 
     id = db.Column(db.String(10), primary_key=True)
-    body_part_name = db.Column(db.String(20), unique=True, nullable=False)
+    body_part_name = db.Column(db.String(50), unique=True, nullable=False)
 
     exercises = db.relationship('ExerciseModel', lazy='dynamic')
 

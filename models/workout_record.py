@@ -41,16 +41,16 @@ class WorkoutRecordModel(db.Model):
     def get_table(cls, exercise_id):
         query = ''' 
             SELECT set_number, weight, reps, created_on FROM workout_record 
-            WHERE exercise_id={} AND created_on in (SELECT DISTINCT created_on FROM workout_record WHERE exercise_id={} ORDER BY created_on DESC LIMIT 3);
-        '''.format(exercise_id, exercise_id)
-        result = db.session.execute(query)
+            WHERE exercise_id= :exercise_id AND created_on in (SELECT DISTINCT created_on FROM workout_record WHERE exercise_id= :exercise_id ORDER BY created_on DESC LIMIT 3);
+        '''
+        result = db.session.execute(query, {'exercise_id': exercise_id})
         rows = []
         for r in result:
             rows.append(dict(r.items()))
 
         df = pd.DataFrame(rows)
-        df.rename(columns={'weight':'0_wgt'}, inplace=True)
-        df.rename(columns={'reps':'1_rep'}, inplace=True)
+        df.rename(columns={'weight':'_kg'}, inplace=True)
+        df.rename(columns={'reps':'rep'}, inplace=True)
         df.created_on = pd.to_datetime(df.created_on)
         df.created_on = df.created_on.dt.strftime('%m-%d')
         created_on = df['created_on'].unique()

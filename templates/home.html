@@ -5,20 +5,21 @@
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Progressive Overload</title>
 
     <!-- Metro 4 -->
     <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css" />
 
     <script type="text/javascript">
         function hostname() {
-            window.value='http://127.0.0.1:5000'
+            window.value = 'http://127.0.0.1:5000'
         }
 
         //functions for body-part
         function append_bodyparts_for_dropdown() {
             hostname()
             $("#bodyparts_dropdown").html('');
-            $.json(window.value+ "/bodyparts").then(
+            $.json(window.value + "/bodyparts").then(
                 function (response) {
                     let body_parts = response["body_parts"];
                     for (let i = 0; i < body_parts.length; i++) {
@@ -44,20 +45,57 @@
         function append_exercises_for_dropdown(body_part) {
             hostname()
             $("#exercises_dropdown").html('');
-            $.json(window.value + "/exercises").then(
+            $.json(window.value + "/body_part/" + body_part).then(
                 function (response) {
-                    let exercises = response["exercises"];
-                    console.log(exercises)
-                    for (let i = 0; i < exercises.length; i++) {
-                        let body_part_from_db = exercises[i]["body_part"]
-                        if (body_part_from_db == body_part) {
-                            append_to_dropdown_exercise(exercises[i]["exercise_name"])
+                    let body_part_id = response["id"];
+                    let user_id = $("#user_id").html()
+                    $.ajax({
+                        url: window.value + "/exercisesforuser",
+                        method: "GET",
+                        data: {
+                            body_part_id: body_part_id,
+                            user_id: user_id
                         }
-                    }
-
+                    }).then(
+                        function (response) {
+                            response_json = JSON.parse(response)
+                            let exercises = response_json["exercises"]
+                            for (i = 0; i < exercises.length; i++) {
+                                append_to_dropdown_exercise(exercises[i]["exercise_name"])
+                            }
+                        }
+                    )
                 }
-            );
-        }
+            )
+        };
+
+        function append_exercises_on_register() {
+            hostname()
+            body_part = $("#value_for_body_part").html()
+            $("#exercises_dropdown").html('');
+            $.json(window.value + "/body_part/" + body_part).then(
+                function (response) {
+                    let body_part_id = response["id"];
+                    let user_id = $("#user_id").html()
+                    $.ajax({
+                        url: window.value + "/exercisesforuser",
+                        method: "GET",
+                        data: {
+                            body_part_id: body_part_id,
+                            user_id: user_id
+                        }
+                    }).then(
+                        function (response) {
+                            response_json = JSON.parse(response)
+                            let exercises = response_json["exercises"]
+                            for (i = 0; i < exercises.length; i++) {
+                                append_to_dropdown_exercise(exercises[i]["exercise_name"])
+                            }
+                        }
+                    )
+                }
+            )
+        };
 
         function append_to_dropdown_exercise(exercise) {
             let tmp_html = '<li onclick="put_exercise_next_to_button(' + "'" + exercise + "'" + ');put_workoutrecord_table_on_dropdown(' + "'" + exercise + "'" + ')"><a>' + exercise + '</a></li>'
@@ -68,19 +106,20 @@
             let tmp = '<strong id="exercise_name">' + exercise_name + '</strong>'
             $('#input_for_exercise').html(tmp)
         }
-        
+
         //functions for adding new exercise
         function post_new_exercise() {
             input_for_body_part = $("#value_for_body_part").html()
             input_for_new_exercise = $("#input_for_new_exercise").val()
+            user_id = $("#user_id").html()
             $.json(window.value + "/body_part/" + input_for_body_part).then(
                 function (response) {
                     body_part_id = response["id"]
                     $.post(window.value + "/exercise/" + input_for_new_exercise, {
-                        body_part_id: body_part_id
+                        body_part_id: body_part_id,
+                        user_id: user_id
                     }).then(
                         function (response) {
-                            console.log(response)
                         }
                     )
                 }
@@ -91,13 +130,20 @@
         function post_workout_record() {
             hostname()
             let exercise_name = $("#exercise_name").html()
-            console.log(exercise_name)
             let set_number = $("#set_number").val()
             let weight = $("#weight").val()
             let reps = $("#reps").val()
-            $.json(window.value + "/exercise/" + exercise_name).then(
+            let user_id = $("#user_id").html()
+            $.ajax({
+                url: window.value + "/exercise/" + exercise_name,
+                method: "GET",
+                data: {
+                    user_id: user_id
+                }
+            }).then(
                 function (response) {
-                    exercise_id = response['id']
+                    response_json = JSON.parse(response)
+                    exercise_id = response_json['id']
                     $.post(window.value + "/workout_record", {
                         set_number: set_number,
                         weight: weight,
@@ -105,25 +151,31 @@
                         exercise_id: exercise_id
                     }).then(
                         function (response) {
-                            console.log(response)
                         }
                     )
                 }
             )
-
         }
 
-        function put_workoutrecord_table_on_dropdown(exercise) {
+        function put_workoutrecord_table_on_dropdown(exercise_name) {
             hostname()
-            let exercise_name = exercise
-            $.json(window.value + "/exercise/" + exercise_name).then(
+            let user_id = $("#user_id").html()
+            $.ajax({
+                url: window.value + "/exercise/" + exercise_name,
+                method: "GET",
+                data: {
+                    user_id: user_id
+                }
+            }).then(
                 function (response) {
-                    exercise_id = response['id']
+                    response_json = JSON.parse(response)
+                    exercise_id = response_json['id']
                     $.ajax({
                         url: window.value + "/workout_record_table",
                         method: "GET",
                         data: {
-                            exercise_id: exercise_id
+                            exercise_id: exercise_id,
+                            user_id: user_id
                         }
                     }).then(
                         function (response) {
@@ -139,9 +191,17 @@
         function put_workoutrecord_table_on_register() {
             hostname()
             let exercise_name = $("#exercise_name").html()
-            $.json(window.value + "/exercise/" + exercise_name).then(
+            let user_id = $("#user_id").html()
+            $.ajax({
+                url: window.value + "/exercise/" + exercise_name,
+                method: "GET",
+                data: {
+                    user_id: user_id
+                }
+            }).then(
                 function (response) {
-                    exercise_id = response['id']
+                    response_json = JSON.parse(response)
+                    exercise_id = response_json['id']
                     $.ajax({
                         url: window.value + "/workout_record_table",
                         method: "GET",
@@ -152,18 +212,35 @@
                         function (response) {
                             response_json = JSON.parse(response)
                             $('#table_testing').html(response_json["response"])
-
                         }
                     )
                 }
             )
+        }
+
+        function countdown_renew() {
+            $("#countdown_events").html('')
+            $("#countdown_events").html('<div id="countdown_events" data-role="countdown" data-start="false" data-seconds="10"></div>')
         }
     </script>
 </head>
 
 <body>
     <div class="container">
-        <div class="grid">
+        <div class="grid demo-grid">
+            <div class="row">
+                <div class="cell-3"></div>
+                <div class="cell-3"></div>
+                <div class="cell-3"></div>
+                <div class="cell-3">
+                    <ul class="h-menu">
+                        <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+            <h4>
+                Welcome, {{ user_name }}!
+            </h4>
             <!-- buttons for body_part and exercise -->
             <div class="row">
                 <!-- body-part here -->
@@ -201,7 +278,7 @@
                     <input type="text" data-role="input" data-prepend="New Exercise: " id="input_for_new_exercise">
                 </div>
                 <div class="cell-2">
-                    <button class="button primary" onclick="post_new_exercise()">Add</button>
+                    <button class="button primary" onclick="post_new_exercise(); append_exercises_on_register()">Add</button>
                 </div>
             </div>
             <!-- set number here -->
@@ -215,7 +292,8 @@
             <div class="row">
                 <div class="cell-12">
                     weight(kg)
-                    <input type="text" data-role="spinner" data-min-value="1" data-step="2.5" data-fixed="1" id="weight">
+                    <input type="text" data-role="spinner" data-min-value="1" data-step="2.5" data-fixed="1"
+                        id="weight">
                 </div>
             </div>
             <!-- reps here -->
@@ -227,10 +305,14 @@
             </div>
             <!-- register here -->
             <div class="row">
-                <div class="cell-12">
-                    <button class="button primary"
-                        onclick="post_workout_record();put_workoutrecord_table_on_register()">Register</button>
+                <div class="cell-5"></div>
+                <div class="cell-2">
+                    <div>
+                        <button class="button primary"
+                            onclick="post_workout_record();put_workoutrecord_table_on_register()">Register</button>
+                    </div>
                 </div>
+                <div class="cell-5"></div>
             </div>
             <!-- workout record here -->
             <div class="row">
@@ -240,14 +322,26 @@
             <!-- countdown start here-->
             <div class="row">
                 <div class="cell-12">
-                    <div id="countdown_events" data-role="countdown" data-start="false" data-seconds="10"
-                        data-on-countdown-create="console.log('Countdown was created!')"></div>
-                    <button class="button mt-2"
-                        onclick="$('#countdown_events').data('countdown').start()">Start</button>
+                    <div id="countdown_events" data-role="countdown" data-start="false" data-seconds="10"></div>
                 </div>
             </div>
+            <div class="row">
+                <div class="cell-3"></div>
+                <div class="cell-2">
+                    <button class="button primary"
+                        onclick="$('#countdown_events').data('countdown').start()">Start</button>
+                </div>
+                <div class="cell-2"></div>
+                <div class="cell-2">
+                    <button class="button primary" onclick="countdown_renew()">Renew</button>
+                </div>
+            </div>
+            <div class="cell-3"></div>
         </div>
     </div>
+    </div>
+    </div>
+    <p style="color:white" id="user_id">{{ user_id }}</p>
     <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
 </body>
 

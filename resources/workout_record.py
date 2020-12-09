@@ -28,14 +28,10 @@ class WorkoutRecord(Resource):
 
 class WorkoutRecordTable(Resource):
     parser = reqparse.RequestParser()
+
+    parser.add_argument(**WorkoutRecordModel.addarg('exercise_id', int))
         
-    parser.add_argument(
-        name= 'exercise_id',
-        type= int,
-        required= True,
-        help= "This field cannot be left blank"
-    )
-    
     def get(self):
         data = WorkoutRecordTable.parser.parse_args()
+        print(data)
         return WorkoutRecordModel.get_table(**data)
