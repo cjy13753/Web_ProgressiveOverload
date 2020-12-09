@@ -219,8 +219,17 @@
         }
 
         function countdown_renew() {
-            $("#countdown_events").html('')
-            $("#countdown_events").html('<div id="countdown_events" data-role="countdown" data-start="false" data-seconds="10"></div>')
+            let countdown_tmp = $("#countdown_tmp").html()
+            $("#countdown_container").html('')
+            $("#countdown_container").html('<div id="countdown_events" data-role="countdown" data-start="false" data-seconds="'+countdown_tmp+'"></div>')
+        }
+
+        function countdown_change() {
+            let countdown_tmp = $("#countdown_tmp").html()
+            let new_countdown = $("#new_countdown").val()
+            $("#countdown_container").html('')
+            $("#countdown_tmp").html(new_countdown)
+            $("#countdown_container").html('<div id="countdown_events" data-role="countdown" data-start="false" data-seconds="'+ new_countdown +'"></div>')
         }
     </script>
 </head>
@@ -321,27 +330,32 @@
             </div>
             <!-- countdown start here-->
             <div class="row">
-                <div class="cell-12">
-                    <div id="countdown_events" data-role="countdown" data-start="false" data-seconds="10"></div>
+                <div class="cell-12" id="countdown_container">
+                    <div id="countdown_events" data-role="countdown" data-start="false" data-seconds="60"></div>
                 </div>
             </div>
             <div class="row">
-                <div class="cell-3"></div>
+                <div class="cell-1"></div>
                 <div class="cell-2">
                     <button class="button primary"
                         onclick="$('#countdown_events').data('countdown').start()">Start</button>
                 </div>
-                <div class="cell-2"></div>
                 <div class="cell-2">
                     <button class="button primary" onclick="countdown_renew()">Renew</button>
                 </div>
+                <div class="cell-4">
+                    <input type="text" placeholder="ex:120" data-role="input" id="new_countdown">
+                </div>
+                <div class="cell-3">
+                    <button class="button primary" onclick="countdown_change()">Change</button>
+                </div>
             </div>
-            <div class="cell-3"></div>
         </div>
     </div>
     </div>
     </div>
     <p style="color:white" id="user_id">{{ user_id }}</p>
+    <p style="color:white" id="countdown_tmp">60</p>
     <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
 </body>
 
