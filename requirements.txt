@@ -1,9 +1,10 @@
+wheel
+uwsgi
 Flask
 Flask-RESTful
-# Flask-JWT
-# Flask-JWT-Extended
+Flask-Login
 Flask-SQLAlchemy
 psycopg2
-uwsgi
 pandas
-Flask-Login
+# Flask-JWT
+# Flask-JWT-Extended

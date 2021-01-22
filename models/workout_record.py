@@ -49,8 +49,8 @@ class WorkoutRecordModel(db.Model):
             rows.append(dict(r.items()))
 
         df = pd.DataFrame(rows)
-        df.rename(columns={'weight':'_kg'}, inplace=True)
-        df.rename(columns={'reps':'rep'}, inplace=True)
+        df.rename(columns={'weight':'___kg'}, inplace=True)
+        df.rename(columns={'reps':'__rep'}, inplace=True)
         df.created_on = pd.to_datetime(df.created_on)
         df.created_on = df.created_on.dt.strftime('%m-%d')
         created_on = df['created_on'].unique()
