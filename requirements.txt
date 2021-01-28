@@ -3,6 +3,7 @@ uwsgi
 Flask
 Flask-RESTful
 Flask-Login
+SQLAlchemy
 Flask-SQLAlchemy
 psycopg2
 pandas

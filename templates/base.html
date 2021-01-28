@@ -17,9 +17,6 @@
                 <div class="container">
                     <div id="navbarMenuHeroA" class="navbar-menu column is-4 is-offset-4">
                         <div class="navbar-end">
-                            <a href="{{ url_for('main.home') }}" class="navbar-item">
-                                Home
-                            </a>
                             {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('auth.login') }}" class="navbar-item">
                                 Login
@@ -29,6 +26,12 @@
                             </a>
                             {% endif %}
                             {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('main.home') }}" class="navbar-item">
+                                ProgressiveOverload
+                            </a>
+                            <a href="http://3.34.179.69:5000" class="navbar-item">
+                                MyOnwWords
+                            </a>
                             <a href="{{ url_for('auth.logout') }}" class="navbar-item">
                                 Logout
                             </a>

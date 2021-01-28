@@ -13,6 +13,8 @@ from models.user import UserModel
 from db import db
 
 app = Flask(__name__)
+print(os.getenv('DATABASE_URL'))
+print(os.getenv('SECRET_KEY'))
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') # set the environment variable in .zshrc
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if not current_user.is_authenticated %}
 <div class="column is-4 is-offset-4">
     <h3 class="title">Login</h3>
     <div class="box">
@@ -33,4 +34,5 @@
         </form>
     </div>
 </div>
+{% endif %}
 {% endblock %}
